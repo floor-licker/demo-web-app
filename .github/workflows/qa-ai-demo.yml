@@ -64,15 +64,23 @@ jobs:
           -v ${{ github.workspace }}:/github/workspace \
           qa-ai-local
         
-    # Step 6: Upload Results
-    - name: Upload QA AI Results
+    # Step 6: Upload Test Results
+    - name: Upload QA AI Test Results
       uses: actions/upload-artifact@v4
       if: always()
       with:
         name: qa-ai-test-results
         path: qa-ai-tests/
         
-    # Step 7: Display Results Summary
+    # Step 7: Upload Exploration Session Data
+    - name: Upload QA AI Session Reports
+      uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: qa-ai-session-reports
+        path: exploration_sessions/
+        
+    # Step 8: Display Results Summary
     - name: Display QA Results Summary
       if: always()
       run: |
@@ -86,7 +94,15 @@ jobs:
           echo "ℹ️ No test files found in qa-ai-tests directory"
         fi
         
-    # Step 8: Cleanup
+        if [ -d "exploration_sessions" ]; then
+          echo ""
+          echo "📋 Session reports:"
+          find exploration_sessions -name "*.md" -o -name "*.json" -o -name "*.xml" | head -10
+        else
+          echo "ℹ️ No session reports found"
+        fi
+        
+    # Step 9: Cleanup
     - name: Cleanup
       if: always()
       run: |
