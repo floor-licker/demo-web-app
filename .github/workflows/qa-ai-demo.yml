@@ -29,14 +29,41 @@ jobs:
         curl -f http://localhost:8080 || exit 1
         echo "✅ Demo app is running on http://localhost:8080"
         
-    # Step 4: Run QA AI Testing (Published Action)
-    - name: Run QA AI Analysis
-      uses: floor-licker/qa-ai@v1.0.0
+    # Step 4: Checkout QA AI source (temporarily for building)
+    - name: Checkout QA AI Source
+      uses: actions/checkout@v4
       with:
-        app_url: 'http://localhost:8080'
-        openai_api_key: ${{ secrets.OPENAI_API_KEY }}
+        repository: floor-licker/qa-ai
+        path: qa-ai-src
         
-    # Step 5: Upload Results
+    # Step 5: Build and Run QA AI Docker Image
+    - name: Build and Run QA AI
+      working-directory: qa-ai-src
+      env:
+        OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+        INPUT_APP_URL: 'http://localhost:8080'
+        INPUT_MAX_DEPTH: '3'
+        INPUT_TIMEOUT: '300'
+        INPUT_HEADLESS: 'true'
+        INPUT_FRAMEWORKS: 'playwright,cypress,jest'
+        INPUT_OUTPUT_DIR: 'qa-ai-tests'
+      run: |
+        echo "🔨 Building QA AI Docker image..."
+        docker build -t qa-ai-local .
+        
+        echo "🚀 Running QA AI analysis..."
+        docker run --rm \
+          -e OPENAI_API_KEY="${OPENAI_API_KEY}" \
+          -e INPUT_APP_URL="${INPUT_APP_URL}" \
+          -e INPUT_MAX_DEPTH="${INPUT_MAX_DEPTH}" \
+          -e INPUT_TIMEOUT="${INPUT_TIMEOUT}" \
+          -e INPUT_HEADLESS="${INPUT_HEADLESS}" \
+          -e INPUT_FRAMEWORKS="${INPUT_FRAMEWORKS}" \
+          -e INPUT_OUTPUT_DIR="${INPUT_OUTPUT_DIR}" \
+          -v ${{ github.workspace }}:/github/workspace \
+          qa-ai-local
+        
+    # Step 6: Upload Results
     - name: Upload QA AI Results
       uses: actions/upload-artifact@v4
       if: always()
@@ -44,7 +71,7 @@ jobs:
         name: qa-ai-test-results
         path: qa-ai-tests/
         
-    # Step 6: Display Results Summary
+    # Step 7: Display Results Summary
     - name: Display QA Results Summary
       if: always()
       run: |
@@ -58,7 +85,7 @@ jobs:
           echo "ℹ️ No test files found in qa-ai-tests directory"
         fi
         
-    # Step 7: Cleanup
+    # Step 8: Cleanup
     - name: Cleanup
       if: always()
       run: |
