@@ -1,0 +1,67 @@
+name: QA AI Demo - Automated Testing
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:  # Manual trigger
+
+jobs:
+  deploy-and-test:
+    runs-on: ubuntu-latest
+    
+    steps:
+    # Step 1: Checkout the demo web app
+    - name: Checkout Demo Web App
+      uses: actions/checkout@v4
+      
+    # Step 2: Setup simple HTTP server
+    - name: Setup Python HTTP Server
+      run: |
+        python3 -m http.server 8080 &
+        echo "HTTP_SERVER_PID=$!" >> $GITHUB_ENV
+        sleep 5  # Wait for server to start
+        
+    # Step 3: Verify app is running
+    - name: Verify App is Running
+      run: |
+        curl -f http://localhost:8080 || exit 1
+        echo "✅ Demo app is running on http://localhost:8080"
+        
+    # Step 4: Checkout QA AI source
+    - name: Checkout QA AI Source
+      uses: actions/checkout@v4
+      with:
+        repository: 'floor-licker/qa-ai'
+        path: 'qa-ai-tool'
+        
+    # Step 5: Run QA AI Testing
+    - name: Run QA AI Analysis
+      uses: ./qa-ai-tool
+      with:
+        app_url: 'http://localhost:8080'
+        max_depth: 4
+        timeout: 300
+        frameworks: 'playwright,cypress'
+        openai_api_key: ${{ secrets.OPENAI_API_KEY }}
+        run_tests: true
+        
+    # Step 5: Display Results
+    - name: Display QA Results
+      run: |
+        echo "🎉 QA AI testing completed!"
+        if [ -d "qa-ai-tests" ]; then
+          echo "📁 Generated test files:"
+          find qa-ai-tests -name "*.spec.ts" -o -name "*.cy.js" | head -10
+          echo ""
+          echo "📊 Total test files: $(find qa-ai-tests -name "*.spec.ts" -o -name "*.cy.js" | wc -l)"
+        fi
+        
+    # Step 6: Cleanup
+    - name: Cleanup
+      if: always()
+      run: |
+        if [ ! -z "$HTTP_SERVER_PID" ]; then
+          kill $HTTP_SERVER_PID || echo "Server already stopped"
+        fi 
