@@ -29,25 +29,14 @@ jobs:
         curl -f http://localhost:8080 || exit 1
         echo "✅ Demo app is running on http://localhost:8080"
         
-    # Step 4: Checkout QA AI Action
-    - name: Checkout QA AI Action
-      uses: actions/checkout@v4
-      with:
-        repository: floor-licker/qa-ai
-        token: ${{ secrets.GITHUB_TOKEN }}
-        path: qa-ai-action
-        
-    # Step 5: Run QA AI Testing (Local Docker Action)
+    # Step 4: Run QA AI Testing (Published Action)
     - name: Run QA AI Analysis
-      uses: ./qa-ai-action
+      uses: floor-licker/qa-ai@v1.0.0
       with:
         app_url: 'http://localhost:8080'
-        max_depth: 4
-        timeout: 300
-        frameworks: 'playwright,cypress'
         openai_api_key: ${{ secrets.OPENAI_API_KEY }}
         
-    # Step 6: Upload Results
+    # Step 5: Upload Results
     - name: Upload QA AI Results
       uses: actions/upload-artifact@v4
       if: always()
@@ -55,7 +44,7 @@ jobs:
         name: qa-ai-test-results
         path: qa-ai-tests/
         
-    # Step 7: Display Results Summary
+    # Step 6: Display Results Summary
     - name: Display QA Results Summary
       if: always()
       run: |
@@ -69,7 +58,7 @@ jobs:
           echo "ℹ️ No test files found in qa-ai-tests directory"
         fi
         
-    # Step 8: Cleanup
+    # Step 7: Cleanup
     - name: Cleanup
       if: always()
       run: |
