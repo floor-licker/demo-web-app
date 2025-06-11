@@ -47,6 +47,7 @@ jobs:
         INPUT_HEADLESS: 'true'
         INPUT_FRAMEWORKS: 'playwright,cypress,jest'
         INPUT_OUTPUT_DIR: 'qa-ai-tests'
+        GITHUB_STEP_SUMMARY: ${{ github.step_summary }}
       run: |
         echo "🔨 Building QA AI Docker image..."
         docker build -t qa-ai-local .
@@ -61,6 +62,8 @@ jobs:
           -e INPUT_HEADLESS="${INPUT_HEADLESS}" \
           -e INPUT_FRAMEWORKS="${INPUT_FRAMEWORKS}" \
           -e INPUT_OUTPUT_DIR="${INPUT_OUTPUT_DIR}" \
+          -e GITHUB_STEP_SUMMARY="${GITHUB_STEP_SUMMARY}" \
+          -e GITHUB_OUTPUT="${GITHUB_OUTPUT}" \
           -v ${{ github.workspace }}:/github/workspace \
           qa-ai-local
         
@@ -85,21 +88,25 @@ jobs:
       if: always()
       run: |
         echo "🎉 QA AI testing completed!"
-        if [ -d "qa-ai-tests" ]; then
-          echo "📁 Generated test files:"
-          find qa-ai-tests -name "*.spec.ts" -o -name "*.cy.js" | head -10
-          echo ""
-          echo "📊 Total test files: $(find qa-ai-tests -name "*.spec.ts" -o -name "*.cy.js" | wc -l)"
-        else
-          echo "ℹ️ No test files found in qa-ai-tests directory"
-        fi
+        echo ""
+        echo "📋 **Results are now displayed in the GitHub Actions Summary above!**"
+        echo "   Click on the workflow run title to see the detailed report."
+        echo ""
         
-        if [ -d "exploration_sessions" ]; then
-          echo ""
-          echo "📋 Session reports:"
-          find exploration_sessions -name "*.md" -o -name "*.json" -o -name "*.xml" | head -10
+        if [ -d "qa-ai-tests" ]; then
+          TEST_COUNT=$(find qa-ai-tests -name "*.spec.ts" -o -name "*.cy.js" -o -name "*.test.js" | wc -l)
+          echo "✅ Generated $TEST_COUNT test files"
+          echo "📁 Test files location: qa-ai-tests/"
+          
+          if [ -f "qa-ai-tests/generation_summary.json" ]; then
+            echo "📊 Generation summary available"
+          fi
+          
+          if [ -f "qa-ai-tests/github-summary.md" ]; then
+            echo "📋 GitHub summary report created"
+          fi
         else
-          echo "ℹ️ No session reports found"
+          echo "⚠️ No test files found in qa-ai-tests directory"
         fi
         
     # Step 9: Cleanup
