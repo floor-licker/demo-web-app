@@ -29,26 +29,27 @@ jobs:
         curl -f http://localhost:8080 || exit 1
         echo "✅ Demo app is running on http://localhost:8080"
         
-    # Step 4: Checkout QA AI source
-    - name: Checkout QA AI Source
-      uses: actions/checkout@v4
-      with:
-        repository: 'floor-licker/qa-ai'
-        path: 'qa-ai-tool'
-        
-    # Step 5: Run QA AI Testing
+    # Step 4: Run QA AI Testing (Docker Action)
     - name: Run QA AI Analysis
-      uses: ./qa-ai-tool
+      uses: floor-licker/qa-ai@main  # Use the main branch for now
       with:
         app_url: 'http://localhost:8080'
         max_depth: 4
         timeout: 300
         frameworks: 'playwright,cypress'
         openai_api_key: ${{ secrets.OPENAI_API_KEY }}
-        run_tests: true
         
-    # Step 5: Display Results
-    - name: Display QA Results
+    # Step 5: Upload Results
+    - name: Upload QA AI Results
+      uses: actions/upload-artifact@v3
+      if: always()
+      with:
+        name: qa-ai-test-results
+        path: qa-ai-tests/
+        
+    # Step 6: Display Results Summary
+    - name: Display QA Results Summary
+      if: always()
       run: |
         echo "🎉 QA AI testing completed!"
         if [ -d "qa-ai-tests" ]; then
@@ -56,9 +57,11 @@ jobs:
           find qa-ai-tests -name "*.spec.ts" -o -name "*.cy.js" | head -10
           echo ""
           echo "📊 Total test files: $(find qa-ai-tests -name "*.spec.ts" -o -name "*.cy.js" | wc -l)"
+        else
+          echo "ℹ️ No test files found in qa-ai-tests directory"
         fi
         
-    # Step 6: Cleanup
+    # Step 7: Cleanup
     - name: Cleanup
       if: always()
       run: |
