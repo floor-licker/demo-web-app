@@ -53,6 +53,7 @@ jobs:
         
         echo "🚀 Running QA AI analysis..."
         docker run --rm \
+          --network host \
           -e OPENAI_API_KEY="${OPENAI_API_KEY}" \
           -e INPUT_APP_URL="${INPUT_APP_URL}" \
           -e INPUT_MAX_DEPTH="${INPUT_MAX_DEPTH}" \
