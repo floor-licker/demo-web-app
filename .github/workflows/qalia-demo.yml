@@ -54,7 +54,7 @@ jobs:
           -e GITHUB_STEP_SUMMARY="${GITHUB_STEP_SUMMARY}" \
           -e GITHUB_OUTPUT="${GITHUB_OUTPUT}" \
           -v ${{ github.workspace }}:/github/workspace \
-          ghcr.io/webisoftSoftware/qalia:main
+          ghcr.io/webisoftsoftware/qalia:main
         
     # Step 5: Upload Test Results
     - name: Upload QA AI Test Results
