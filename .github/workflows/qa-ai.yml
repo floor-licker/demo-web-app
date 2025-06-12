@@ -23,7 +23,7 @@ jobs:
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
-          password: ${{ secrets.PAT_GITHUB }}
+          password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Run QA AI analysis
         run: |
@@ -38,4 +38,4 @@ jobs:
             -e INPUT_OUTPUT_DIR=/app/output \
             -e GITHUB_STEP_SUMMARY=/app/output/summary.md \
             -v ${{ github.workspace }}/output:/app/output \
-            ghcr.io/webisoftsoftware/qalia:main 
+            ghcr.io/floor-licker/qalia:main 
