@@ -1,0 +1,111 @@
+name: QA AI Demo - Registry Version
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:  # Manual trigger
+
+jobs:
+  deploy-and-test:
+    runs-on: ubuntu-latest
+    
+    steps:
+    # Step 1: Checkout the demo web app
+    - name: Checkout Demo Web App
+      uses: actions/checkout@v4
+      
+    # Step 2: Setup simple HTTP server
+    - name: Setup Python HTTP Server
+      run: |
+        python3 -m http.server 8080 &
+        echo "HTTP_SERVER_PID=$!" >> $GITHUB_ENV
+        sleep 5  # Wait for server to start
+        
+    # Step 3: Verify app is running
+    - name: Verify App is Running
+      run: |
+        curl -f http://localhost:8080 || exit 1
+        echo "✅ Demo app is running on http://localhost:8080"
+        
+    # Step 4: Run QA AI using Published GitHub Action
+    - name: Run QA AI Analysis (GitHub Action)
+      uses: floor-licker/qalia@v1
+      with:
+        app_url: 'http://localhost:8080'
+        max_depth: 3
+        timeout: 300
+        headless: true
+        frameworks: 'playwright,cypress,jest'
+        output_dir: 'qalia-tests'
+        openai_api_key: ${{ secrets.OPENAI_API_KEY }}
+        
+    # Alternative: Step 4B - Run QA AI using Published Docker Image
+    - name: Run QA AI Analysis (Docker Registry)
+      if: false  # Disabled by default, enable by changing to true
+      env:
+        OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+      run: |
+        echo "🚀 Running QA AI from published Docker image..."
+        docker run --rm \
+          --network host \
+          -e OPENAI_API_KEY="${OPENAI_API_KEY}" \
+          -e INPUT_APP_URL="http://localhost:8080" \
+          -e INPUT_MAX_DEPTH="3" \
+          -e INPUT_TIMEOUT="300" \
+          -e INPUT_HEADLESS="true" \
+          -e INPUT_FRAMEWORKS="playwright,cypress,jest" \
+          -e INPUT_OUTPUT_DIR="qalia-tests" \
+          -e GITHUB_STEP_SUMMARY="${{ github.step_summary }}" \
+          -e GITHUB_OUTPUT="${GITHUB_OUTPUT}" \
+          -v ${{ github.workspace }}:/github/workspace \
+          ghcr.io/floor-licker/qalia:latest
+        
+    # Step 5: Upload Test Results
+    - name: Upload QA AI Test Results
+      uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: qalia-test-results
+        path: qalia-tests/
+        
+    # Step 6: Upload Exploration Session Data
+    - name: Upload QA AI Session Reports
+      uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: qalia-session-reports
+        path: exploration_sessions/
+        
+    # Step 7: Display Results Summary
+    - name: Display QA Results Summary
+      if: always()
+      run: |
+        echo "🎉 QA AI testing completed using published registry image!"
+        echo ""
+        echo "📋 **Results are displayed in the GitHub Actions Summary above!**"
+        echo ""
+        
+        if [ -d "qalia-tests" ]; then
+          TEST_COUNT=$(find qalia-tests -name "*.spec.ts" -o -name "*.cy.js" -o -name "*.test.js" | wc -l)
+          echo "✅ Generated $TEST_COUNT test files"
+          echo "📁 Test files location: qalia-tests/"
+          
+          echo ""
+          echo "🚀 **Advantages of Registry Approach:**"
+          echo "  • ⚡ Faster execution (no build time)"
+          echo "  • 🎯 Stable, tested image"
+          echo "  • 📦 Consistent results"
+          echo "  • 🔄 Automatic updates with new releases"
+        else
+          echo "⚠️ No test files found in qalia-tests directory"
+        fi
+        
+    # Step 8: Cleanup
+    - name: Cleanup
+      if: always()
+      run: |
+        if [ ! -z "$HTTP_SERVER_PID" ]; then
+          kill $HTTP_SERVER_PID || echo "Server already stopped"
+        fi 
