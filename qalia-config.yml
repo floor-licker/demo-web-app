@@ -1,0 +1,26 @@
+# QA AI Configuration for Demo Web App
+version: 1.0
+
+# Basic settings
+max_pages: 10
+max_depth: 3
+timeout: 300  # 5 minutes
+
+# Target URLs to analyze
+targets:
+  - url: http://localhost:3000  # Update this with your actual URL
+    name: "Demo Web App Homepage"
+
+# Test generation settings
+test_generation:
+  framework: jest
+  output_dir: ./jest
+  include_visual: true
+  include_accessibility: true
+
+# Reporting settings
+reporting:
+  format: json
+  output_file: generation_summary.json
+  include_screenshots: true
+  screenshot_dir: ./screenshots 

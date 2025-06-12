@@ -27,9 +27,9 @@ This is a comprehensive e-commerce demo that demonstrates how to integrate **QA 
 This demo includes **automated QA AI testing** that runs on every push:
 
 ```yaml
-# .github/workflows/qa-ai-demo.yml
+# .github/workflows/qalia-demo.yml
 - name: Run QA AI Analysis
-  uses: floor-licker/qa-ai@v1
+  uses: floor-licker/qalia@v1
   with:
     app_url: 'http://localhost:8080'
     max_depth: 4
@@ -93,7 +93,7 @@ After QA AI runs, you'll get:
 
 ### **Generated Test Files**
 ```
-qa-ai-tests/
+qalia-tests/
 ├── playwright/
 │   ├── product-browsing.spec.ts
 │   ├── shopping-cart.spec.ts
@@ -155,7 +155,7 @@ This demo app is designed to showcase QA AI's capabilities:
 
 ### **Basic Integration**
 ```yaml
-- uses: floor-licker/qa-ai@v1
+- uses: floor-licker/qalia@v1
   with:
     app_url: 'https://your-demo-app.com'
     openai_api_key: ${{ secrets.OPENAI_API_KEY }}
@@ -163,7 +163,7 @@ This demo app is designed to showcase QA AI's capabilities:
 
 ### **Advanced E-commerce Testing**
 ```yaml
-- uses: floor-licker/qa-ai@v1
+- uses: floor-licker/qalia@v1
   with:
     app_url: 'https://your-store.com'
     max_depth: 6  # Deep exploration for complex flows

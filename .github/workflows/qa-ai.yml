@@ -1,0 +1,27 @@
+name: QA AI Analysis
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  qa-ai:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+      checks: write
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Run QA AI Analysis
+        uses: juliustranquilli/qalia@main
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          config_file: qalia-config.yml
+          # Optional: Add any specific configuration for the demo web app
+          # max_pages: 10
+          # max_depth: 3 
