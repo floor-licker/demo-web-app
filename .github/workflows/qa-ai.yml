@@ -18,16 +18,27 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Run QA AI Analysis
-        uses: webisoftsoftware/qalia@main
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          app_url: 'http://localhost:8080'
-          openai_api_key: ${{ secrets.OPENAI_API_KEY }}
-          max_depth: 3
-          timeout: 300
-          headless: true
-          frameworks: 'playwright,cypress,jest'
-          output_dir: 'qalia-tests'
-          # Optional: Add any specific configuration for the demo web app
-          # max_pages: 10
-          # config_file: qalia-config.yml 
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          INPUT_APP_URL: 'http://localhost:8080'
+          INPUT_MAX_DEPTH: '3'
+          INPUT_TIMEOUT: '300'
+          INPUT_HEADLESS: 'true'
+          INPUT_FRAMEWORKS: 'playwright,cypress,jest'
+          INPUT_OUTPUT_DIR: 'qalia-tests'
+          GITHUB_STEP_SUMMARY: ${{ github.step_summary }}
+        run: |
+          echo "🚀 Running QA AI analysis..."
+          docker run --rm \
+            --network host \
+            -e OPENAI_API_KEY="${OPENAI_API_KEY}" \
+            -e INPUT_APP_URL="${INPUT_APP_URL}" \
+            -e INPUT_MAX_DEPTH="${INPUT_MAX_DEPTH}" \
+            -e INPUT_TIMEOUT="${INPUT_TIMEOUT}" \
+            -e INPUT_HEADLESS="${INPUT_HEADLESS}" \
+            -e INPUT_FRAMEWORKS="${INPUT_FRAMEWORKS}" \
+            -e INPUT_OUTPUT_DIR="${INPUT_OUTPUT_DIR}" \
+            -e GITHUB_STEP_SUMMARY="${GITHUB_STEP_SUMMARY}" \
+            -e GITHUB_OUTPUT="${GITHUB_OUTPUT}" \
+            -v ${{ github.workspace }}:/github/workspace \
+            ghcr.io/webisoftsoftware/qalia:main 
