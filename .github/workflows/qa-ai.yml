@@ -18,10 +18,16 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Run QA AI Analysis
-        uses: juliustranquilli/qalia@main
+        uses: webisoftSoftware/qalia@main
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          config_file: qalia-config.yml
+          app_url: 'http://localhost:8080'
+          openai_api_key: ${{ secrets.OPENAI_API_KEY }}
+          max_depth: 3
+          timeout: 300
+          headless: true
+          frameworks: 'playwright,cypress,jest'
+          output_dir: 'qalia-tests'
           # Optional: Add any specific configuration for the demo web app
           # max_pages: 10
-          # max_depth: 3 
+          # config_file: qalia-config.yml 

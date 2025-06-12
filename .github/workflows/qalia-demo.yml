@@ -29,16 +29,8 @@ jobs:
         curl -f http://localhost:8080 || exit 1
         echo "✅ Demo app is running on http://localhost:8080"
         
-    # Step 4: Checkout QA AI source (temporarily for building)
-    - name: Checkout QA AI Source
-      uses: actions/checkout@v4
-      with:
-        repository: floor-licker/qalia
-        path: qalia-src
-        
-    # Step 5: Build and Run QA AI Docker Image
-    - name: Build and Run QA AI
-      working-directory: qalia-src
+    # Step 4: Run QA AI using the published image
+    - name: Run QA AI Analysis
       env:
         OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
         INPUT_APP_URL: 'http://localhost:8080'
@@ -49,9 +41,6 @@ jobs:
         INPUT_OUTPUT_DIR: 'qalia-tests'
         GITHUB_STEP_SUMMARY: ${{ github.step_summary }}
       run: |
-        echo "🔨 Building QA AI Docker image..."
-        docker build -t qalia-local .
-        
         echo "🚀 Running QA AI analysis..."
         docker run --rm \
           --network host \
@@ -65,9 +54,9 @@ jobs:
           -e GITHUB_STEP_SUMMARY="${GITHUB_STEP_SUMMARY}" \
           -e GITHUB_OUTPUT="${GITHUB_OUTPUT}" \
           -v ${{ github.workspace }}:/github/workspace \
-          qalia-local
+          ghcr.io/webisoftSoftware/qalia:main
         
-    # Step 6: Upload Test Results
+    # Step 5: Upload Test Results
     - name: Upload QA AI Test Results
       uses: actions/upload-artifact@v4
       if: always()
@@ -75,7 +64,7 @@ jobs:
         name: qalia-test-results
         path: qalia-tests/
         
-    # Step 7: Upload Exploration Session Data
+    # Step 6: Upload Exploration Session Data
     - name: Upload QA AI Session Reports
       uses: actions/upload-artifact@v4
       if: always()
@@ -83,7 +72,7 @@ jobs:
         name: qalia-session-reports
         path: exploration_sessions/
         
-    # Step 8: Display Results Summary
+    # Step 7: Display Results Summary
     - name: Display QA Results Summary
       if: always()
       run: |
@@ -109,7 +98,7 @@ jobs:
           echo "⚠️ No test files found in qalia-tests directory"
         fi
         
-    # Step 9: Cleanup
+    # Step 8: Cleanup
     - name: Cleanup
       if: always()
       run: |
