@@ -176,3 +176,6 @@ This demo app is designed to showcase QA AI's capabilities:
 **🎉 This demo shows how QA AI can automatically discover and test complex user journeys in modern web applications!**
 
 Ready to add QA AI to your project? Check out the [Integration Guide](../INTEGRATION_GUIDE.md)! # Test trigger
+
+## 🧪 Testing Qalia GitHub App
+This change is to test the Qalia GitHub App integration.
