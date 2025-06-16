@@ -1,3 +1,0 @@
-Testing Qalia integration with various changes
-This is a test file to trigger qalia.ai analysis
-Added new line to test DigitalOcean deployment - $(date) 
