@@ -179,23 +179,3 @@ Ready to add QA AI to your project? Check out the [Integration Guide](../INTEGRA
 
 ## 🧪 Testing Qalia GitHub App
 This change is to test the Qalia GitHub App integration.
-# 🤖 Testing Complete Qalia.ai GitHub App
-
-This PR tests the fully functional Qalia.ai GitHub App with:
-- ✅ Fixed Playwright browser installation
-- ✅ Proper GitHub authentication
-- ✅ Repository cloning with access tokens
-- ✅ qalia.yml configuration support
-- ✅ Complete branding as Qalia.ai
-
-Expected results:
-- Check run should appear with 'Qalia.ai Analysis'
-- PR comment should be posted with proper branding
-- Static HTML app should be deployed and tested
-
-Test timestamp: Fri Jun 13 19:36:58 EDT 2025
-Manual webhook trigger - Fri Jun 13 19:46:24 EDT 2025
-Testing after fixing Playwright and qalia.yml - Fri Jun 13 19:48:47 EDT 2025
-Testing with runtime Playwright installation - Fri Jun 13 20:47:30 EDT 2025
-Testing with fallback browser support - Fri Jun 13 21:05:03 EDT 2025
-Testing with simplified static site testing fallback - Fri Jun 13 21:07:26 EDT 2025
