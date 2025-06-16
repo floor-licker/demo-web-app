@@ -6,6 +6,11 @@ deployment:
   type: static
   port: 8080
   build_dir: "."
+  # Add entrypoint for local development
+  entrypoint: "python3 -m http.server 8080"
+  # Alternative options:
+  # entrypoint: "npx serve -p 8080 ."
+  # entrypoint: "php -S 0.0.0.0:8080"
 
 # Testing configuration
 testing:
