@@ -1,0 +1,16 @@
+🚀 Testing Qalia.ai with Fixed Webhook Endpoint 🚀
+
+This PR tests the corrected webhook configuration:
+- Webhook URL: http://157.245.241.244:8000/webhook ✅
+- DigitalOcean server: Running ✅
+- GitHub App: Configured ✅
+
+Expected behavior:
+1. GitHub sends webhook to /webhook endpoint
+2. Qalia clones this demo-web-app repository  
+3. Serves the app locally on port 8080
+4. Playwright analyzes the web application
+5. AI generates comprehensive QA report
+6. Posts analysis as PR comment
+
+Test timestamp: $(date) 
