@@ -179,3 +179,9 @@ Ready to add QA AI to your project? Check out the [Integration Guide](../INTEGRA
 
 ## 🧪 Testing Qalia GitHub App
 This change is to test the Qalia GitHub App integration.
+
+## Testing Webhook Logging Improvements
+Testing the improved webhook logging and error handling - Fri Jun 13 16:57:40 EDT 2025
+Testing after fixing environment variables - Fri Jun 13 16:58:49 EDT 2025
+Testing after service redeployment with GITHUB_APP_ID - Fri Jun 13 17:01:30 EDT 2025
+Testing after fixing GitHub client creation - Fri Jun 13 17:03:50 EDT 2025
