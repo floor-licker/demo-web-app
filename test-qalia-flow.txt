@@ -3,3 +3,4 @@ Testing after config fix - Tue Jun 17 10:37:59 EDT 2025
 Testing with improved cloning logic - Tue Jun 17 10:42:12 EDT 2025
 Testing with fixed git PATH - Tue Jun 17 10:50:37 EDT 2025
 Testing with properly configured qalia.yml - local deployment - Tue Jun 17 10:55:11 EDT 2025
+Testing with type: static deployment - Tue Jun 17 10:57:17 EDT 2025
