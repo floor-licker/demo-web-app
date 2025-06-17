@@ -1,41 +1,22 @@
-# Test Trigger File
+# Test Trigger File - Config Fix Test
 # This file is used to trigger Qalia.ai analysis pipeline
 
-Last update: Real-time monitoring test
-Timestamp: $(date '+%Y-%m-%d %H:%M:%S')
-Change count: 4
+Last update: Testing config fix for ChatGPT analysis
+Timestamp: 2025-06-17 17:22:00
+Change count: 6
 
 ## Purpose
 This file exists to easily trigger CI/CD pipeline tests.
 
 ## Recent Changes
 - Updated OpenAI API key on Digital Ocean server
-- Testing full analysis pipeline
-- Triggering another run for real-time monitoring
+- Fixed config parsing error (removed inline comment from MAX_ANALYSIS_TIMEOUT)
+- Testing full ChatGPT analysis in PR comments
 
-## Test Status
-Ready for real-time analysis monitoring!
+## Expected Result
+Full ChatGPT analysis should now appear in PR comments without "status unknown" message!
 
-🔑 Testing Fixed Webhook Signature Validation 🔑
-
-This PR tests the corrected webhook signature configuration:
-- Webhook URL: http://157.245.241.244:8000/webhook ✅
-- Webhook Secret: 348ff9b2f9f486b2bcb85297b33cf5810bc3de86 ✅
-- DigitalOcean server: Running ✅
-- Environment variables: Loaded ✅
-- GitHub App: Configured ✅
-
-Expected behavior:
-1. GitHub sends webhook with correct signature ✅
-2. Server validates signature successfully (no more 403 Forbidden)
-3. Qalia creates GitHub client successfully
-4. Qalia clones this demo-web-app repository  
-5. Serves the app locally on port 8080
-6. Playwright analyzes the web application
-7. AI generates comprehensive QA report
-8. Posts analysis as PR comment
-
-Test timestamp: $(date)
-Signature fix attempt: #3
-
-This should be the final test - webhook signature validation is now properly configured! 
+## Fix Applied
+Removed inline comment from .env file:
+- Before: MAX_ANALYSIS_TIMEOUT=1800  # 30 minutes instead of 600
+- After: MAX_ANALYSIS_TIMEOUT=1800 
