@@ -1,1 +1,2 @@
 Testing full qalia.ai flow with proper deployment - Tue Jun 17 10:30:34 EDT 2025
+Testing after config fix - Tue Jun 17 10:37:59 EDT 2025
