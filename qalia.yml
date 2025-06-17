@@ -4,6 +4,7 @@ version: 1.0
 # Deployment configuration
 deployment:
   type: static
+  url: "https://floor-licker.github.io/demo-web-app"
   port: 8080
   build_dir: "."
 
