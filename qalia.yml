@@ -3,10 +3,8 @@ version: 1.0
 
 # Deployment configuration
 deployment:
-  type: static
-  url: "https://floor-licker.github.io/demo-web-app"
+
   port: 8080
-  build_dir: "."
 
 # Testing configuration
 testing:
@@ -23,10 +21,9 @@ testing:
     viewport:
       width: 1920
       height: 1080
-    # Increase timeouts for cloud environments
-    navigation_timeout: 60000  # 60 seconds for page navigation
-    action_timeout: 15000     # 15 seconds for individual actions
-    element_wait_timeout: 30000  # 30 seconds for element waits
+    navigation_timeout: 60000
+    action_timeout: 15000
+    element_wait_timeout: 30000
   
   generation:
     frameworks: ["playwright", "cypress", "jest"]
