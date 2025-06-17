@@ -1,84 +1,36 @@
-// Sample product data
+// Simple product data
 const products = [
     {
         id: 1,
         name: "MacBook Pro 16\"",
         category: "laptops",
         price: 2399,
-        originalPrice: 2599,
         description: "Powerful laptop with M2 Pro chip, perfect for professionals and creators.",
-        image: "📱",
-        inStock: true
+        image: "💻"
     },
     {
         id: 2,
-        name: "Dell XPS 13",
-        category: "laptops", 
-        price: 1299,
-        originalPrice: 1499,
-        description: "Ultra-portable laptop with stunning display and premium build quality.",
-        image: "💻",
-        inStock: true
-    },
-    {
-        id: 3,
         name: "iPhone 15 Pro",
         category: "phones",
         price: 999,
-        originalPrice: null,
         description: "Latest iPhone with titanium design and advanced camera system.",
-        image: "📱",
-        inStock: true
+        image: "📱"
     },
     {
-        id: 4,
-        name: "Samsung Galaxy S24",
-        category: "phones",
-        price: 899,
-        originalPrice: 999,
-        description: "Flagship Android phone with AI-powered features and stunning camera.",
-        image: "📱",
-        inStock: false
-    },
-    {
-        id: 5,
+        id: 3,
         name: "iPad Pro 12.9\"",
         category: "tablets",
         price: 1099,
-        originalPrice: null,
         description: "Professional tablet with M2 chip and Liquid Retina XDR display.",
-        image: "📱",
-        inStock: true
+        image: "📱"
     },
     {
-        id: 6,
-        name: "Surface Pro 9",
-        category: "tablets",
-        price: 999,
-        originalPrice: 1199,
-        description: "Versatile 2-in-1 tablet that works like a laptop.",
-        image: "💻",
-        inStock: true
-    },
-    {
-        id: 7,
-        name: "Lenovo ThinkPad X1",
-        category: "laptops",
-        price: 1799,
-        originalPrice: 1999,
-        description: "Business laptop with legendary reliability and performance.",
-        image: "💻",
-        inStock: true
-    },
-    {
-        id: 8,
-        name: "Google Pixel 8",
-        category: "phones",
-        price: 699,
-        originalPrice: 799,
-        description: "AI-first smartphone with incredible photography capabilities.",
-        image: "📱",
-        inStock: true
+        id: 4,
+        name: "Dell XPS 13",
+        category: "laptops", 
+        price: 1299,
+        description: "Ultra-portable laptop with stunning display and premium build quality.",
+        image: "💻"
     }
 ];
 
@@ -91,7 +43,7 @@ let currentProduct = null;
 // Initialize the app
 document.addEventListener('DOMContentLoaded', function() {
     loadProducts();
-    setupEventListeners();
+    setupNavigation();
     updateCartCount();
     
     // Simulate loading state
@@ -100,9 +52,8 @@ document.addEventListener('DOMContentLoaded', function() {
     }, 500);
 });
 
-// Setup event listeners
-function setupEventListeners() {
-    // Navigation smooth scrolling
+// Setup navigation
+function setupNavigation() {
     document.querySelectorAll('.nav-link').forEach(link => {
         link.addEventListener('click', function(e) {
             e.preventDefault();
@@ -121,63 +72,31 @@ function setupEventListeners() {
             }
         });
     });
-
-    // Close modals when clicking outside
-    document.addEventListener('click', function(e) {
-        if (e.target.classList.contains('modal')) {
-            closeAllModals();
-        }
-    });
-
-    // Keyboard navigation
-    document.addEventListener('keydown', function(e) {
-        if (e.key === 'Escape') {
-            closeAllModals();
-        }
-    });
 }
 
-// Product functions
-function loadProducts(filter = 'all') {
+// Load products
+function loadProducts() {
     const productGrid = document.getElementById('productGrid');
-    const filteredProducts = filter === 'all' ? products : products.filter(p => p.category === filter);
-    
     productGrid.innerHTML = '';
     
-    filteredProducts.forEach(product => {
+    products.forEach(product => {
         const productCard = createProductCard(product);
         productGrid.appendChild(productCard);
     });
-    
-    // Add loading animation
-    productGrid.style.opacity = '0';
-    setTimeout(() => {
-        productGrid.style.opacity = '1';
-    }, 100);
 }
 
+// Create product card
 function createProductCard(product) {
     const card = document.createElement('div');
     card.className = 'product-card';
-    card.onclick = () => showProductDetail(product);
-    
-    const stockStatus = product.inStock ? '' : '<span style="color: #dc3545; font-size: 0.9rem;">Out of Stock</span>';
-    const priceHTML = product.originalPrice ? 
-        `<span class="price">$${product.price}</span><span class="original-price">$${product.originalPrice}</span>` :
-        `<span class="price">$${product.price}</span>`;
     
     card.innerHTML = `
         <div class="product-image">${product.image}</div>
         <div class="product-info">
             <h3>${product.name}</h3>
             <p>${product.description}</p>
-            ${stockStatus}
             <div class="product-price">
-                ${priceHTML}
-                <button class="add-to-cart" onclick="event.stopPropagation(); addToCart(${product.id})" 
-                        ${!product.inStock ? 'disabled style="opacity: 0.5; cursor: not-allowed;"' : ''}>
-                    ${product.inStock ? 'Add to Cart' : 'Out of Stock'}
-                </button>
+                <span class="price">$${product.price}</span>
             </div>
         </div>
     `;
@@ -185,6 +104,18 @@ function createProductCard(product) {
     return card;
 }
 
+// Scroll to products section
+function scrollToProducts() {
+    const productsSection = document.getElementById('products');
+    if (productsSection) {
+        productsSection.scrollIntoView({ 
+            behavior: 'smooth', 
+            block: 'start' 
+        });
+    }
+}
+
+// Product functions
 function filterProducts(category) {
     currentFilter = category;
     
@@ -192,7 +123,7 @@ function filterProducts(category) {
     document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
     event.target.classList.add('active');
     
-    loadProducts(category);
+    loadProducts();
 }
 
 function searchProducts() {
@@ -200,7 +131,7 @@ function searchProducts() {
     const productGrid = document.getElementById('productGrid');
     
     if (!searchTerm) {
-        loadProducts(currentFilter);
+        loadProducts();
         return;
     }
     
@@ -234,7 +165,7 @@ function toggleSearch() {
         searchInput.focus();
     } else {
         searchInput.value = '';
-        loadProducts(currentFilter);
+        loadProducts();
     }
 }
 
@@ -283,8 +214,8 @@ function closeAllModals() {
 function addToCart(productId, quantity = 1) {
     const product = products.find(p => p.id === productId);
     
-    if (!product || !product.inStock) {
-        showMessage('Product is out of stock!', 'error');
+    if (!product) {
+        showMessage('Product not found!', 'error');
         return;
     }
     
@@ -505,13 +436,6 @@ function submitContactForm(event) {
 }
 
 // Utility functions
-function scrollToProducts() {
-    document.getElementById('products').scrollIntoView({ 
-        behavior: 'smooth', 
-        block: 'start' 
-    });
-}
-
 function showMessage(text, type = 'info') {
     // Remove existing messages
     document.querySelectorAll('.message').forEach(msg => msg.remove());
