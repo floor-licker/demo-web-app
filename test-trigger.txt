@@ -1,9 +1,9 @@
 # Test Trigger File
 # This file is used to trigger Qalia.ai analysis pipeline
 
-Last update: Testing updated OpenAI API key
-Timestamp: $(date)
-Change count: 3
+Last update: Real-time monitoring test
+Timestamp: $(date '+%Y-%m-%d %H:%M:%S')
+Change count: 4
 
 ## Purpose
 This file exists to easily trigger CI/CD pipeline tests.
@@ -11,23 +11,31 @@ This file exists to easily trigger CI/CD pipeline tests.
 ## Recent Changes
 - Updated OpenAI API key on Digital Ocean server
 - Testing full analysis pipeline
+- Triggering another run for real-time monitoring
 
 ## Test Status
-Ready for analysis with new API key!
+Ready for real-time analysis monitoring!
 
-🚀 Testing Qalia.ai with Fixed Webhook Endpoint 🚀
+🔑 Testing Fixed Webhook Signature Validation 🔑
 
-This PR tests the corrected webhook configuration:
+This PR tests the corrected webhook signature configuration:
 - Webhook URL: http://157.245.241.244:8000/webhook ✅
+- Webhook Secret: 348ff9b2f9f486b2bcb85297b33cf5810bc3de86 ✅
 - DigitalOcean server: Running ✅
+- Environment variables: Loaded ✅
 - GitHub App: Configured ✅
 
 Expected behavior:
-1. GitHub sends webhook to /webhook endpoint
-2. Qalia clones this demo-web-app repository  
-3. Serves the app locally on port 8080
-4. Playwright analyzes the web application
-5. AI generates comprehensive QA report
-6. Posts analysis as PR comment
+1. GitHub sends webhook with correct signature ✅
+2. Server validates signature successfully (no more 403 Forbidden)
+3. Qalia creates GitHub client successfully
+4. Qalia clones this demo-web-app repository  
+5. Serves the app locally on port 8080
+6. Playwright analyzes the web application
+7. AI generates comprehensive QA report
+8. Posts analysis as PR comment
 
-Test timestamp: $(date) 
+Test timestamp: $(date)
+Signature fix attempt: #3
+
+This should be the final test - webhook signature validation is now properly configured! 
