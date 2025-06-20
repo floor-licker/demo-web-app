@@ -4,8 +4,8 @@ import { test, expect, Page } from '@playwright/test';
  * Test suite for general functionality
  * 
  * Generated from Qalia exploration session
- * Base URL: http://localhost:8083
- * Generated: 2025-06-20T17:38:01.311170
+ * Base URL: http://localhost:8084
+ * Generated: 2025-06-20T17:39:45.018062
  */
 
 test.describe('general_tests', () => {
@@ -13,7 +13,7 @@ test.describe('general_tests', () => {
 
   test.beforeEach(async ({ page: testPage }) => {
     page = testPage;
-    await page.goto('http://localhost:8083');
+    await page.goto('http://localhost:8084');
 
   
   test('test_initial_exploration_happy_path', async () => {
@@ -22,10 +22,10 @@ test.describe('general_tests', () => {
     // Priority: medium
     
     // Click button: View Products
-    await page.click('[data-testid="view-products"], [data-test="view-products"], [aria-label="View Products"], button:has-text("View Products"), text="View Products"', { timeout: 5993 });
+    await page.click('[data-testid="view-products"], [data-test="view-products"], [aria-label="View Products"], button:has-text("View Products"), text="View Products"', { timeout: 6132 });
 
     // Click button: View Products
-    await page.click('[data-testid="view-products"], [data-test="view-products"], [aria-label="View Products"], button:has-text("View Products"), text="View Products"', { timeout: 5916 });
+    await page.click('[data-testid="view-products"], [data-test="view-products"], [aria-label="View Products"], button:has-text("View Products"), text="View Products"', { timeout: 5941 });
 
   });
 
