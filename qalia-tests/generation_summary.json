@@ -3,7 +3,7 @@
     "total_test_cases": 4,
     "total_test_suites": 2,
     "total_journeys_analyzed": 1,
-    "generation_timestamp": "2025-06-20T17:59:40.725165"
+    "generation_timestamp": "2025-06-20T18:01:24.228715"
   },
   "test_breakdown": {
     "by_priority": {
@@ -30,7 +30,7 @@
     }
   ],
   "metadata": {
-    "base_url": "http://localhost:8095",
+    "base_url": "http://localhost:8096",
     "source_session": "unknown",
     "total_source_actions": 2
   }
