@@ -4,8 +4,8 @@ import { test, expect, Page } from '@playwright/test';
  * Test suite for  functionality
  * 
  * Generated from Qalia exploration session
- * Base URL: http://localhost:8093
- * Generated: 2025-06-20T17:56:19.355988
+ * Base URL: http://localhost:8094
+ * Generated: 2025-06-20T17:58:01.439658
  */
 
 test.describe('_tests', () => {
@@ -13,7 +13,7 @@ test.describe('_tests', () => {
 
   test.beforeEach(async ({ page: testPage }) => {
     page = testPage;
-    await page.goto('http://localhost:8093');
+    await page.goto('http://localhost:8094');
 
   
   test('test_network_error_handling', async () => {
@@ -33,7 +33,7 @@ test.describe('_tests', () => {
     // Priority: medium
     
     // Navigate to home page
-    await page.goto('http://localhost:8093', { timeout: 10000 });
+    await page.goto('http://localhost:8094', { timeout: 10000 });
     // Performance assertion: Page should load in under 3 seconds
 
   });
