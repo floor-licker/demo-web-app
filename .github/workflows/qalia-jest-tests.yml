@@ -1,0 +1,54 @@
+name: "\U0001F0CF Qalia Jest Tests"
+'on':
+  repository_dispatch:
+    types:
+    - qalia-test-jest
+  pull_request:
+    branches:
+    - main
+    - master
+    - develop
+  push:
+    branches:
+    - main
+    - master
+  workflow_dispatch: null
+jobs:
+  jest-tests:
+    name: Run Jest Tests
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        ref: ${{ github.event.client_payload.commit_sha || github.sha }}
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: npm
+        cache-dependency-path: qalia-tests/jest/package-lock.json
+    - name: Check if tests exist
+      id: check-tests
+      run: "\n                                if [ -d \"qalia-tests/jest\" ] && [\
+        \ -f \"qalia-tests/jest/package.json\" ]; then\n                         \
+        \           echo \"exists=true\" >> $GITHUB_OUTPUT\n                     \
+        \               echo \"\u2705 Jest tests found\"\n                       \
+        \         else\n                                    echo \"exists=false\"\
+        \ >> $GITHUB_OUTPUT\n                                    echo \"\u26A0\uFE0F\
+        \ Jest tests not found - skipping\"\n                                fi\n\
+        \                            "
+    - name: Install dependencies
+      if: steps.check-tests.outputs.exists == 'true'
+      run: cd qalia-tests/jest && npm ci
+    - name: Run Jest tests
+      if: steps.check-tests.outputs.exists == 'true'
+      run: cd qalia-tests/jest && npm test
+      env:
+        CI: 'true'
+    - name: Upload Jest Coverage
+      uses: actions/upload-artifact@v4
+      if: always() && steps.check-tests.outputs.exists == 'true'
+      with:
+        name: jest-coverage
+        path: qalia-tests/jest/coverage/
