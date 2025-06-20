@@ -2,8 +2,8 @@
  * Test suite for general functionality
  * 
  * Generated from Qalia exploration session
- * Base URL: http://localhost:8089
- * Generated: 2025-06-20T17:48:48.771772
+ * Base URL: http://localhost:8090
+ * Generated: 2025-06-20T17:50:59.965531
  */
 
 const puppeteer = require('puppeteer');
@@ -22,7 +22,7 @@ describe('general_tests', () => {
 
   beforeEach(async () => {
     page = await browser.newPage();
-    await page.goto('http://localhost:8089');
+    await page.goto('http://localhost:8090');
   });
 
   afterEach(async () => {
@@ -36,10 +36,10 @@ describe('general_tests', () => {
     // Priority: medium
     
     // Click button: View Products
-    await page.click('[data-testid="view-products"], [data-test="view-products"], [aria-label="View Products"], button:has-text("View Products"), text="View Products"', { timeout: 5981 });
+    await page.click('[data-testid="view-products"], [data-test="view-products"], [aria-label="View Products"], button:has-text("View Products"), text="View Products"', { timeout: 5993 });
 
     // Click button: View Products
-    await page.click('[data-testid="view-products"], [data-test="view-products"], [aria-label="View Products"], button:has-text("View Products"), text="View Products"', { timeout: 5904 });
+    await page.click('[data-testid="view-products"], [data-test="view-products"], [aria-label="View Products"], button:has-text("View Products"), text="View Products"', { timeout: 5962 });
 
   }, 30000);
 
