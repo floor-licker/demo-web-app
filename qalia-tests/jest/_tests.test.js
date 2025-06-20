@@ -2,8 +2,8 @@
  * Test suite for  functionality
  * 
  * Generated from Qalia exploration session
- * Base URL: http://localhost:8094
- * Generated: 2025-06-20T17:58:01.440408
+ * Base URL: http://localhost:8095
+ * Generated: 2025-06-20T17:59:40.725106
  */
 
 const puppeteer = require('puppeteer');
@@ -22,7 +22,7 @@ describe('_tests', () => {
 
   beforeEach(async () => {
     page = await browser.newPage();
-    await page.goto('http://localhost:8094');
+    await page.goto('http://localhost:8095');
   });
 
   afterEach(async () => {
@@ -46,7 +46,7 @@ describe('_tests', () => {
     // Priority: medium
     
     // Navigate to home page
-    await page.goto('http://localhost:8094');
+    await page.goto('http://localhost:8095');
 
   }, 30000);
 
