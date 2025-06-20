@@ -2,13 +2,13 @@
  * Test suite for  functionality
  * 
  * Generated from Qalia exploration session
- * Base URL: http://localhost:8087
- * Generated: 2025-06-20T17:45:10.389807
+ * Base URL: http://localhost:8088
+ * Generated: 2025-06-20T17:46:57.570712
  */
 
 describe('_tests', () => {
   beforeEach(() => {
-    cy.visit('http://localhost:8087');
+    cy.visit('http://localhost:8088');
   });
 
   
@@ -28,7 +28,7 @@ describe('_tests', () => {
     // Priority: medium
     
     // Navigate to home page
-    cy.visit('http://localhost:8087');
+    cy.visit('http://localhost:8088');
 
   });
 
