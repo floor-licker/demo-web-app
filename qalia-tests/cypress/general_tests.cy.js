@@ -2,13 +2,13 @@
  * Test suite for general functionality
  * 
  * Generated from Qalia exploration session
- * Base URL: http://localhost:8090
- * Generated: 2025-06-20T17:50:59.965374
+ * Base URL: http://localhost:8091
+ * Generated: 2025-06-20T17:52:39.949431
  */
 
 describe('general_tests', () => {
   beforeEach(() => {
-    cy.visit('http://localhost:8090');
+    cy.visit('http://localhost:8091');
   });
 
   
@@ -18,10 +18,10 @@ describe('general_tests', () => {
     // Priority: medium
     
     // Click button: View Products
-    cy.get('[data-testid="view-products"], [data-test="view-products"], [aria-label="View Products"], button:has-text("View Products"), text="View Products"').click({ timeout: 5993 });
+    cy.get('[data-testid="view-products"], [data-test="view-products"], [aria-label="View Products"], button:has-text("View Products"), text="View Products"').click({ timeout: 5953 });
 
     // Click button: View Products
-    cy.get('[data-testid="view-products"], [data-test="view-products"], [aria-label="View Products"], button:has-text("View Products"), text="View Products"').click({ timeout: 5962 });
+    cy.get('[data-testid="view-products"], [data-test="view-products"], [aria-label="View Products"], button:has-text("View Products"), text="View Products"').click({ timeout: 5944 });
 
   });
 
