@@ -8,15 +8,24 @@ name: "\U0001F916 Qalia Generated Tests"
     - main
     - master
     - develop
+    paths-ignore:
+    - qalia-tests/**
+    - .github/workflows/qalia-*.yml
   push:
     branches:
     - main
     - master
+    paths-ignore:
+    - qalia-tests/**
+    - .github/workflows/qalia-*.yml
   workflow_dispatch: null
 jobs:
   test-matrix:
     name: Test ${{ matrix.framework }}
     runs-on: ubuntu-latest
+    if: "!contains(github.event.head_commit.message, '\U0001F916 Add Qalia generated\
+      \ tests and workflows') && !contains(github.event.head_commit.author.name, 'Qalia\
+      \ AI')"
     strategy:
       fail-fast: false
       matrix:

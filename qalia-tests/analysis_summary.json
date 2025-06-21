@@ -1,0 +1,30 @@
+{
+  "generation_summary": {
+    "total_test_cases": 3,
+    "total_test_suites": 1,
+    "total_journeys_analyzed": 0,
+    "generation_timestamp": "2025-06-20T19:03:46.037091"
+  },
+  "test_breakdown": {
+    "by_priority": {
+      "high": 1,
+      "medium": 2
+    },
+    "by_category": {
+      "": 3
+    }
+  },
+  "test_suites": [
+    {
+      "name": "_tests",
+      "description": "Test suite for  functionality",
+      "test_count": 3,
+      "estimated_duration": 90
+    }
+  ],
+  "metadata": {
+    "base_url": "http://localhost:3000",
+    "source_session": "unknown",
+    "total_source_actions": 0
+  }
+}
