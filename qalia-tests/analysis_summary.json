@@ -3,7 +3,7 @@
     "total_test_cases": 3,
     "total_test_suites": 1,
     "total_journeys_analyzed": 0,
-    "generation_timestamp": "2025-06-21T20:19:54.285081"
+    "generation_timestamp": "2025-06-27T16:11:26.499168"
   },
   "test_breakdown": {
     "by_priority": {
@@ -14,17 +14,27 @@
       "": 3
     }
   },
+  "state_coverage": {
+    "total_states_discovered": 0,
+    "states_covered_by_tests": 0,
+    "coverage_percentage": 100,
+    "uncovered_states_count": 0,
+    "is_complete_coverage": true,
+    "uncovered_state_samples": []
+  },
   "test_suites": [
     {
       "name": "_tests",
       "description": "Test suite for  functionality",
       "test_count": 3,
-      "estimated_duration": 90
+      "estimated_duration": 90,
+      "is_state_coverage": false
     }
   ],
   "metadata": {
     "base_url": "http://localhost:3000",
     "source_session": "unknown",
-    "total_source_actions": 0
+    "total_source_actions": 0,
+    "state_tracking_enabled": false
   }
 }
