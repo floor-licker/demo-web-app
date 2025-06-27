@@ -5,7 +5,7 @@ import { test, expect, Page } from '@playwright/test';
  * 
  * Generated from Qalia exploration session
  * Base URL: http://localhost:3000
- * Generated: 2025-06-27T14:22:42.669314
+ * Generated: 2025-06-27T15:00:02.764141
  */
 
 test.describe('_tests', () => {
