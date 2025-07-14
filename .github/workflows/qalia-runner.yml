@@ -1,0 +1,73 @@
+name: Qalia Test Runner
+
+on:
+  workflow_dispatch:
+    inputs:
+      test_file:
+        description: 'Test file to run'
+        required: true
+        type: string
+      framework:
+        description: 'Test framework (cypress, jest, playwright)'
+        required: true
+        type: string
+
+jobs:
+  run-test:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'npm'
+        
+    - name: Install dependencies
+      run: |
+        if [ -f package.json ]; then
+          npm ci
+        else
+          echo "No package.json found, installing framework directly"
+          case "${{ github.event.inputs.framework }}" in
+            "cypress")
+              npm install cypress@latest
+              ;;
+            "jest")
+              npm install jest@latest
+              ;;
+            "playwright")
+              npm install @playwright/test@latest
+              npx playwright install
+              ;;
+          esac
+        fi
+        
+    - name: Run Cypress test
+      if: github.event.inputs.framework == 'cypress'
+      run: |
+        npx cypress run --spec "${{ github.event.inputs.test_file }}" --headless
+        
+    - name: Run Jest test  
+      if: github.event.inputs.framework == 'jest'
+      run: |
+        npx jest "${{ github.event.inputs.test_file }}" --json --outputFile=test-results.json
+        
+    - name: Run Playwright test
+      if: github.event.inputs.framework == 'playwright'
+      run: |
+        npx playwright test "${{ github.event.inputs.test_file }}" --reporter=json --output=test-results.json
+        
+    - name: Upload test results
+      uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: test-results
+        path: |
+          test-results.json
+          cypress/videos/
+          cypress/screenshots/
+          test-results/
