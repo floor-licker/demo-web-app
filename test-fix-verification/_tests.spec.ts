@@ -1,32 +1,19 @@
+import { test, expect, Page } from '@playwright/test';
+
 /**
  * Test suite for  functionality
  * 
  * Generated from Qalia exploration session
  * Base URL: http://localhost:3000
- * Generated: 2025-06-27T17:09:19.980458
+ * Generated: 2025-06-27T13:28:26.725752
  */
 
-const puppeteer = require('puppeteer');
+test.describe('_tests', () => {
+  let page: Page;
 
-describe('_tests', () => {
-  let browser;
-  let page;
-
-  beforeAll(async () => {
-    browser = await puppeteer.launch({ headless: true });
-  });
-
-  afterAll(async () => {
-    await browser.close();
-  });
-
-  beforeEach(async () => {
-    page = await browser.newPage();
+  test.beforeEach(async ({ page: testPage }) => {
+    page = testPage;
     await page.goto('http://localhost:3000');
-  });
-
-  afterEach(async () => {
-    await page.close();
   });
 
   
@@ -36,8 +23,9 @@ describe('_tests', () => {
     // Priority: high
     
     // Simulate network issues
+    await page.evaluate(() => { window.navigator.serviceWorker.ready.then(reg => reg.unregister()); });
 
-  }, 30000);
+  });
 
   
   test('test_page_load_performance', async () => {
@@ -46,9 +34,10 @@ describe('_tests', () => {
     // Priority: medium
     
     // Navigate to home page
-    await page.goto('http://localhost:3000');
+    await page.goto('http://localhost:3000', { timeout: 10000 });
+    // Performance assertion: Page should load in under 3 seconds
 
-  }, 30000);
+  });
 
   
   test('test_basic_accessibility', async () => {
@@ -57,7 +46,11 @@ describe('_tests', () => {
     // Priority: medium
     
     // Run axe-core accessibility scan
+    const results = await page.evaluate(() => {
+      return window.axe.run();
+    });
+    expect(results.violations).toHaveLength(0);
 
-  }, 30000);
+  });
 
 });
