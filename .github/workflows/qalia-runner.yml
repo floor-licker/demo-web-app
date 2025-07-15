@@ -25,22 +25,118 @@ jobs:
       with:
         node-version: '18'
         
+    - name: Create test framework package.json if needed
+      run: |
+        case "${{ github.event.inputs.framework }}" in
+          "cypress")
+            if [ -d "qalia-tests/cypress" ] && [ ! -f "qalia-tests/cypress/package.json" ]; then
+              cd qalia-tests/cypress
+              cat > package.json << 'EOF'
+        {
+          "name": "qalia-cypress-tests",
+          "version": "1.0.0",
+          "description": "Qalia generated Cypress tests",
+          "scripts": {
+            "test": "cypress run",
+            "test:headed": "cypress run --headed"
+          },
+          "devDependencies": {
+            "cypress": "^13.0.0"
+          }
+        }
+        EOF
+            fi
+            ;;
+          "jest")
+            if [ -d "qalia-tests/jest" ] && [ ! -f "qalia-tests/jest/package.json" ]; then
+              cd qalia-tests/jest
+              cat > package.json << 'EOF'
+        {
+          "name": "qalia-jest-tests",
+          "version": "1.0.0",
+          "description": "Qalia generated Jest tests",
+          "scripts": {
+            "test": "jest"
+          },
+          "devDependencies": {
+            "jest": "^29.0.0",
+            "puppeteer": "^21.0.0"
+          }
+        }
+        EOF
+            fi
+            ;;
+          "playwright")
+            if [ -d "qalia-tests/playwright" ] && [ ! -f "qalia-tests/playwright/package.json" ]; then
+              cd qalia-tests/playwright
+              cat > package.json << 'EOF'
+        {
+          "name": "qalia-playwright-tests",
+          "version": "1.0.0",
+          "description": "Qalia generated Playwright tests",
+          "scripts": {
+            "test": "playwright test",
+            "test:headed": "playwright test --headed",
+            "test:debug": "playwright test --debug"
+          },
+          "devDependencies": {
+            "@playwright/test": "^1.40.0",
+            "@types/node": "^20.0.0"
+          }
+        }
+        EOF
+            fi
+            ;;
+        esac
+        
     - name: Install dependencies
       run: |
         if [ -f package.json ]; then
           npm ci
         else
-          echo "No package.json found, installing framework directly"
+          echo "No package.json found, installing framework directly in test directory"
           case "${{ github.event.inputs.framework }}" in
             "cypress")
-              npm install cypress@latest
+              if [ -d "qalia-tests/cypress" ]; then
+                cd qalia-tests/cypress
+                if [ -f "package.json" ]; then
+                  npm ci
+                else
+                  npm init -y
+                  npm install cypress@latest --save-dev
+                fi
+              else
+                npm install cypress@latest
+              fi
               ;;
             "jest")
-              npm install jest@latest
+              if [ -d "qalia-tests/jest" ]; then
+                cd qalia-tests/jest
+                if [ -f "package.json" ]; then
+                  npm ci
+                else
+                  npm init -y
+                  npm install jest@latest puppeteer@latest --save-dev
+                fi
+              else
+                npm install jest@latest puppeteer@latest
+              fi
               ;;
             "playwright")
-              npm install @playwright/test@latest
-              npx playwright install
+              if [ -d "qalia-tests/playwright" ]; then
+                cd qalia-tests/playwright
+                if [ -f "package.json" ]; then
+                  npm ci
+                  npx playwright install
+                else
+                  npm init -y
+                  npm install @playwright/test@latest @types/node@latest --save-dev
+                  npx playwright install
+                fi
+              else
+                npm install @playwright/test@latest
+                npx playwright install
+              fi
               ;;
           esac
         fi
@@ -48,17 +144,47 @@ jobs:
     - name: Run Cypress test
       if: github.event.inputs.framework == 'cypress'
       run: |
-        npx cypress run --spec "${{ github.event.inputs.test_file }}" --headless
+        if [ -d "qalia-tests/cypress" ] && [ -f "qalia-tests/cypress/cypress.config.js" ]; then
+          cd qalia-tests/cypress
+          # Extract just the filename if the path includes the directory structure
+          TEST_FILE="${{ github.event.inputs.test_file }}"
+          if [[ "$TEST_FILE" == qalia-tests/cypress/* ]]; then
+            TEST_FILE="${TEST_FILE#qalia-tests/cypress/}"
+          fi
+          npx cypress run --spec "$TEST_FILE" --headless
+        else
+          npx cypress run --spec "${{ github.event.inputs.test_file }}" --headless
+        fi
         
     - name: Run Jest test  
       if: github.event.inputs.framework == 'jest'
       run: |
-        npx jest "${{ github.event.inputs.test_file }}" --json --outputFile=test-results.json
+        if [ -d "qalia-tests/jest" ]; then
+          cd qalia-tests/jest
+          # Extract just the filename if the path includes the directory structure
+          TEST_FILE="${{ github.event.inputs.test_file }}"
+          if [[ "$TEST_FILE" == qalia-tests/jest/* ]]; then
+            TEST_FILE="${TEST_FILE#qalia-tests/jest/}"
+          fi
+          npx jest "$TEST_FILE" --json --outputFile=test-results.json
+        else
+          npx jest "${{ github.event.inputs.test_file }}" --json --outputFile=test-results.json
+        fi
         
     - name: Run Playwright test
       if: github.event.inputs.framework == 'playwright'
       run: |
-        npx playwright test "${{ github.event.inputs.test_file }}" --reporter=json --output=test-results.json
+        if [ -d "qalia-tests/playwright" ] && [ -f "qalia-tests/playwright/playwright.config.ts" ]; then
+          cd qalia-tests/playwright
+          # Extract just the filename if the path includes the directory structure
+          TEST_FILE="${{ github.event.inputs.test_file }}"
+          if [[ "$TEST_FILE" == qalia-tests/playwright/* ]]; then
+            TEST_FILE="${TEST_FILE#qalia-tests/playwright/}"
+          fi
+          npx playwright test "$TEST_FILE" --reporter=json
+        else
+          npx playwright test "${{ github.event.inputs.test_file }}" --reporter=json
+        fi
         
     - name: Upload test results
       uses: actions/upload-artifact@v4
@@ -67,6 +193,10 @@ jobs:
         name: test-results
         path: |
           test-results.json
+          qalia-tests/*/test-results*
+          qalia-tests/cypress/videos/
+          qalia-tests/cypress/screenshots/
           cypress/videos/
           cypress/screenshots/
           test-results/
+          playwright-report/
