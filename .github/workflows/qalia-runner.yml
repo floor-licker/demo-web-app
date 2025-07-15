@@ -91,55 +91,65 @@ jobs:
         
     - name: Install dependencies
       run: |
-        if [ -f package.json ]; then
-          npm ci
-        else
-          echo "No package.json found, installing framework directly in test directory"
-          case "${{ github.event.inputs.framework }}" in
-            "cypress")
-              if [ -d "qalia-tests/cypress" ]; then
-                cd qalia-tests/cypress
-                if [ -f "package.json" ]; then
+        case "${{ github.event.inputs.framework }}" in
+          "cypress")
+            if [ -d "qalia-tests/cypress" ]; then
+              cd qalia-tests/cypress
+              if [ -f "package.json" ]; then
+                # Use npm install if no lock file exists, otherwise use npm ci
+                if [ -f "package-lock.json" ]; then
                   npm ci
                 else
-                  npm init -y
-                  npm install cypress@latest --save-dev
+                  npm install
                 fi
               else
-                npm install cypress@latest
+                npm init -y
+                npm install cypress@latest --save-dev
               fi
-              ;;
-            "jest")
-              if [ -d "qalia-tests/jest" ]; then
-                cd qalia-tests/jest
-                if [ -f "package.json" ]; then
+            else
+              npm install cypress@latest
+            fi
+            ;;
+          "jest")
+            if [ -d "qalia-tests/jest" ]; then
+              cd qalia-tests/jest
+              if [ -f "package.json" ]; then
+                # Use npm install if no lock file exists, otherwise use npm ci
+                if [ -f "package-lock.json" ]; then
                   npm ci
                 else
-                  npm init -y
-                  npm install jest@latest puppeteer@latest --save-dev
+                  npm install
                 fi
               else
-                npm install jest@latest puppeteer@latest
+                npm init -y
+                npm install jest@latest puppeteer@latest --save-dev
               fi
-              ;;
-            "playwright")
-              if [ -d "qalia-tests/playwright" ]; then
-                cd qalia-tests/playwright
-                if [ -f "package.json" ]; then
+            else
+              npm install jest@latest puppeteer@latest
+            fi
+            ;;
+          "playwright")
+            if [ -d "qalia-tests/playwright" ]; then
+              cd qalia-tests/playwright
+              if [ -f "package.json" ]; then
+                # Use npm install if no lock file exists, otherwise use npm ci
+                if [ -f "package-lock.json" ]; then
                   npm ci
-                  npx playwright install
                 else
-                  npm init -y
-                  npm install @playwright/test@latest @types/node@latest --save-dev
-                  npx playwright install
+                  npm install
                 fi
+                npx playwright install
               else
-                npm install @playwright/test@latest
+                npm init -y
+                npm install @playwright/test@latest @types/node@latest --save-dev
                 npx playwright install
               fi
-              ;;
-          esac
-        fi
+            else
+              npm install @playwright/test@latest
+              npx playwright install
+            fi
+            ;;
+        esac
         
     - name: Run Cypress test
       if: github.event.inputs.framework == 'cypress'
