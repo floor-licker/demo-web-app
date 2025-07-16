@@ -3,13 +3,10 @@ version: 1.0
 
 # Deployment configuration
 deployment:
-  startup: "python -m http.server {port}"
+  type: static
   port: 8080
-<<<<<<< HEAD
   build_dir: "."
   startup: "python -m http.server {port} --directory ."
-=======
->>>>>>> 73e6c6f10cce2d3427d72393f16bdbd27695484f
 
 # Testing configuration
 testing:
