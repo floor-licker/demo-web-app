@@ -1,212 +1,38 @@
-name: Qalia Test Runner
-
-on:
-  workflow_dispatch:
-    inputs:
-      test_file:
-        description: 'Test file to run'
-        required: true
-        type: string
-      framework:
-        description: 'Test framework (cypress, jest, playwright)'
-        required: true
-        type: string
-
-jobs:
-  run-test:
-    runs-on: ubuntu-latest
+- name: Run Playwright test
+  working-directory: qalia-tests/playwright
+  run: |
+    echo "Current directory: $(pwd)"
+    echo "Files in directory:"
+    ls -la
     
-    steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
-      
-    - name: Setup Node.js
-      uses: actions/setup-node@v4
-      with:
-        node-version: '18'
-        
-    - name: Create test framework package.json if needed
-      run: |
-        case "${{ github.event.inputs.framework }}" in
-          "cypress")
-            if [ -d "qalia-tests/cypress" ] && [ ! -f "qalia-tests/cypress/package.json" ]; then
-              cd qalia-tests/cypress
-              cat > package.json << 'EOF'
-        {
-          "name": "qalia-cypress-tests",
-          "version": "1.0.0",
-          "description": "Qalia generated Cypress tests",
-          "scripts": {
-            "test": "cypress run",
-            "test:headed": "cypress run --headed"
-          },
-          "devDependencies": {
-            "cypress": "^13.0.0"
-          }
-        }
-        EOF
-            fi
-            ;;
-          "jest")
-            if [ -d "qalia-tests/jest" ] && [ ! -f "qalia-tests/jest/package.json" ]; then
-              cd qalia-tests/jest
-              cat > package.json << 'EOF'
-        {
-          "name": "qalia-jest-tests",
-          "version": "1.0.0",
-          "description": "Qalia generated Jest tests",
-          "scripts": {
-            "test": "jest"
-          },
-          "devDependencies": {
-            "jest": "^29.0.0",
-            "puppeteer": "^21.0.0"
-          }
-        }
-        EOF
-            fi
-            ;;
-          "playwright")
-            if [ -d "qalia-tests/playwright" ] && [ ! -f "qalia-tests/playwright/package.json" ]; then
-              cd qalia-tests/playwright
-              cat > package.json << 'EOF'
-        {
-          "name": "qalia-playwright-tests",
-          "version": "1.0.0",
-          "description": "Qalia generated Playwright tests",
-          "scripts": {
-            "test": "playwright test",
-            "test:headed": "playwright test --headed",
-            "test:debug": "playwright test --debug"
-          },
-          "devDependencies": {
-            "@playwright/test": "^1.40.0",
-            "@types/node": "^20.0.0"
-          }
-        }
-        EOF
-            fi
-            ;;
-        esac
-        
-    - name: Install dependencies
-      run: |
-        case "${{ github.event.inputs.framework }}" in
-          "cypress")
-            if [ -d "qalia-tests/cypress" ]; then
-              cd qalia-tests/cypress
-              if [ -f "package.json" ]; then
-                # Use npm install if no lock file exists, otherwise use npm ci
-                if [ -f "package-lock.json" ]; then
-                  npm ci
-                else
-                  npm install
-                fi
-              else
-                npm init -y
-                npm install cypress@latest --save-dev
-              fi
-            else
-              npm install cypress@latest
-            fi
-            ;;
-          "jest")
-            if [ -d "qalia-tests/jest" ]; then
-              cd qalia-tests/jest
-              if [ -f "package.json" ]; then
-                # Use npm install if no lock file exists, otherwise use npm ci
-                if [ -f "package-lock.json" ]; then
-                  npm ci
-                else
-                  npm install
-                fi
-              else
-                npm init -y
-                npm install jest@latest puppeteer@latest --save-dev
-              fi
-            else
-              npm install jest@latest puppeteer@latest
-            fi
-            ;;
-          "playwright")
-            if [ -d "qalia-tests/playwright" ]; then
-              cd qalia-tests/playwright
-              if [ -f "package.json" ]; then
-                # Use npm install if no lock file exists, otherwise use npm ci
-                if [ -f "package-lock.json" ]; then
-                  npm ci
-                else
-                  npm install
-                fi
-                npx playwright install
-              else
-                npm init -y
-                npm install @playwright/test@latest @types/node@latest --save-dev
-                npx playwright install
-              fi
-            else
-              npm install @playwright/test@latest
-              npx playwright install
-            fi
-            ;;
-        esac
-        
-    - name: Run Cypress test
-      if: github.event.inputs.framework == 'cypress'
-      run: |
-        if [ -d "qalia-tests/cypress" ] && [ -f "qalia-tests/cypress/cypress.config.js" ]; then
-          cd qalia-tests/cypress
-          # Extract just the filename if the path includes the directory structure
-          TEST_FILE="${{ github.event.inputs.test_file }}"
-          if [[ "$TEST_FILE" == qalia-tests/cypress/* ]]; then
-            TEST_FILE="${TEST_FILE#qalia-tests/cypress/}"
-          fi
-          npx cypress run --spec "$TEST_FILE" --headless
-        else
-          npx cypress run --spec "${{ github.event.inputs.test_file }}" --headless
-        fi
-        
-    - name: Run Jest test  
-      if: github.event.inputs.framework == 'jest'
-      run: |
-        if [ -d "qalia-tests/jest" ]; then
-          cd qalia-tests/jest
-          # Extract just the filename if the path includes the directory structure
-          TEST_FILE="${{ github.event.inputs.test_file }}"
-          if [[ "$TEST_FILE" == qalia-tests/jest/* ]]; then
-            TEST_FILE="${TEST_FILE#qalia-tests/jest/}"
-          fi
-          npx jest "$TEST_FILE" --json --outputFile=test-results.json
-        else
-          npx jest "${{ github.event.inputs.test_file }}" --json --outputFile=test-results.json
-        fi
-        
-    - name: Run Playwright test
-      if: github.event.inputs.framework == 'playwright'
-      run: |
-        if [ -d "qalia-tests/playwright" ] && [ -f "qalia-tests/playwright/playwright.config.ts" ]; then
-          cd qalia-tests/playwright
-          # Extract just the filename if the path includes the directory structure
-          TEST_FILE="${{ github.event.inputs.test_file }}"
-          if [[ "$TEST_FILE" == qalia-tests/playwright/* ]]; then
-            TEST_FILE="${TEST_FILE#qalia-tests/playwright/}"
-          fi
-          npx playwright test "$TEST_FILE" --reporter=json
-        else
-          npx playwright test "${{ github.event.inputs.test_file }}" --reporter=json
-        fi
-        
-    - name: Upload test results
-      uses: actions/upload-artifact@v4
-      if: always()
-      with:
-        name: test-results
-        path: |
-          test-results.json
-          qalia-tests/*/test-results*
-          qalia-tests/cypress/videos/
-          qalia-tests/cypress/screenshots/
-          cypress/videos/
-          cypress/screenshots/
-          test-results/
-          playwright-report/
+    # Create config if it doesn't exist
+    if [ ! -f "playwright.config.ts" ] && [ ! -f "playwright.config.js" ]; then
+      echo "Creating minimal Playwright config..."
+      cat > playwright.config.ts << 'EOF'
+    import { defineConfig, devices } from '@playwright/test';
+
+    export default defineConfig({
+      testDir: '.',
+      timeout: 30000,
+      projects: [
+        { name: 'chromium', use: { ...devices['Desktop Chrome'] } },
+        { name: 'firefox', use: { ...devices['Desktop Firefox'] } },
+        // WebKit disabled due to missing system dependencies in GitHub Actions
+      ],
+      use: {
+        headless: true,
+        viewport: { width: 1280, height: 720 },
+        ignoreHTTPSErrors: true,
+      },
+    });
+    EOF
+    fi
+    
+    # Extract just the filename if the path includes the directory structure
+    TEST_FILE="${{ github.event.inputs.test_file }}"
+    if [[ "$TEST_FILE" == qalia-tests/playwright/* ]]; then
+      TEST_FILE="${TEST_FILE#qalia-tests/playwright/}"
+    fi
+    
+    echo "Running test file: $TEST_FILE"
+    npx playwright test "$TEST_FILE" --reporter=json
