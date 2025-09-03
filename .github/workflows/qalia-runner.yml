@@ -1,38 +1,146 @@
-- name: Run Playwright test
-  working-directory: qalia-tests/playwright
-  run: |
-    echo "Current directory: $(pwd)"
-    echo "Files in directory:"
-    ls -la
-    
-    # Create config if it doesn't exist
-    if [ ! -f "playwright.config.ts" ] && [ ! -f "playwright.config.js" ]; then
-      echo "Creating minimal Playwright config..."
-      cat > playwright.config.ts << 'EOF'
-    import { defineConfig, devices } from '@playwright/test';
+name: Qalia Test Runner
 
-    export default defineConfig({
-      testDir: '.',
-      timeout: 30000,
-      projects: [
-        { name: 'chromium', use: { ...devices['Desktop Chrome'] } },
-        { name: 'firefox', use: { ...devices['Desktop Firefox'] } },
-        // WebKit disabled due to missing system dependencies in GitHub Actions
-      ],
-      use: {
-        headless: true,
-        viewport: { width: 1280, height: 720 },
-        ignoreHTTPSErrors: true,
-      },
-    });
-    EOF
-    fi
+on:
+  workflow_dispatch:
+    inputs:
+      test_file:
+        description: 'Test file to run'
+        required: true
+        type: string
+      framework:
+        description: 'Test framework (playwright only)'
+        required: false
+        type: string
+        default: 'playwright'
+
+jobs:
+  run-test:
+    runs-on: ubuntu-latest
     
-    # Extract just the filename if the path includes the directory structure
-    TEST_FILE="${{ github.event.inputs.test_file }}"
-    if [[ "$TEST_FILE" == qalia-tests/playwright/* ]]; then
-      TEST_FILE="${TEST_FILE#qalia-tests/playwright/}"
-    fi
-    
-    echo "Running test file: $TEST_FILE"
-    npx playwright test "$TEST_FILE" --reporter=json
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        
+    - name: Verify directory structure
+      run: |
+        echo "Repository structure:"
+        ls -la
+        echo "Checking for qalia-tests directory:"
+        if [ -d "qalia-tests" ]; then
+          echo "qalia-tests directory exists"
+          ls -la qalia-tests/
+          if [ -d "qalia-tests/playwright" ]; then
+            echo "playwright subdirectory exists"
+            ls -la qalia-tests/playwright/
+          else
+            echo "playwright subdirectory NOT found"
+          fi
+        else
+          echo "qalia-tests directory NOT found"
+        fi
+        
+    - name: Create Playwright package.json if needed
+      run: |
+        if [ -d "qalia-tests/playwright" ] && [ ! -f "qalia-tests/playwright/package.json" ]; then
+          cd qalia-tests/playwright
+          cat > package.json << 'PACKAGE_EOF'
+        {
+          "name": "qalia-playwright-tests",
+          "version": "1.0.0",
+          "description": "Qalia generated Playwright tests",
+          "scripts": {
+            "test": "playwright test",
+            "test:headed": "playwright test --headed",
+            "test:debug": "playwright test --debug"
+          },
+          "devDependencies": {
+            "@playwright/test": "^1.40.0",
+            "@types/node": "^20.0.0"
+          }
+        }
+        PACKAGE_EOF
+        fi
+        
+    - name: Install Playwright dependencies
+      run: |
+        if [ -d "qalia-tests/playwright" ]; then
+          cd qalia-tests/playwright
+          echo "Installing dependencies in: $(pwd)"
+          if [ -f "package.json" ]; then
+            # Use npm install if no lock file exists, otherwise use npm ci
+            if [ -f "package-lock.json" ]; then
+              npm ci
+            else
+              npm install
+            fi
+            npx playwright install
+          else
+            npm init -y
+            npm install @playwright/test@latest @types/node@latest --save-dev
+            npx playwright install
+          fi
+        else
+          echo "qalia-tests/playwright directory not found, installing globally"
+          npm install @playwright/test@latest
+          npx playwright install
+        fi
+        
+    - name: Run Playwright test
+      working-directory: qalia-tests/playwright
+      run: |
+        # Ensure we're in the right directory
+        echo "Current directory: $(pwd)"
+        echo "Files in directory:"
+        ls -la
+        
+        # Create config if it doesn't exist
+        if [ ! -f "playwright.config.ts" ] && [ ! -f "playwright.config.js" ]; then
+          echo "Creating minimal Playwright config..."
+          cat > playwright.config.ts << 'CONFIG_EOF'
+        import { defineConfig, devices } from '@playwright/test';
+
+        export default defineConfig({
+          testDir: '.',
+          timeout: 30000,
+          projects: [
+            { name: 'chromium', use: { ...devices['Desktop Chrome'] } },
+            { name: 'firefox', use: { ...devices['Desktop Firefox'] } },
+            // WebKit disabled due to missing system dependencies in GitHub Actions
+          ],
+          use: {
+            headless: true,
+            viewport: { width: 1280, height: 720 },
+            ignoreHTTPSErrors: true,
+          },
+        });
+        CONFIG_EOF
+        fi
+        
+        # Extract just the filename if the path includes the directory structure
+        TEST_FILE="${{ github.event.inputs.test_file }}"
+        if [[ "$TEST_FILE" == qalia-tests/playwright/* ]]; then
+          TEST_FILE="${TEST_FILE#qalia-tests/playwright/}"
+        fi
+        
+        echo "Running test file: $TEST_FILE"
+        npx playwright test "$TEST_FILE" --reporter=json
+        
+    - name: Upload test results
+      uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: test-results
+        path: |
+          test-results.json
+          qalia-tests/*/test-results*
+          qalia-tests/cypress/videos/
+          qalia-tests/cypress/screenshots/
+          cypress/videos/
+          cypress/screenshots/
+          test-results/
+          playwright-report/
